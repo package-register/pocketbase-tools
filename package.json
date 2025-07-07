@@ -1,0 +1,41 @@
+{
+  "name": "pocketbase-tools",
+  "version": "0.1.8",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "bun run format && bun tsc",
+    "prepublishOnly": "bun run build",
+    "test": "bun test",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "docs": "typedoc --out docs src"
+  },
+  "files": [
+    "dist"
+  ],
+  "module": "src/index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "np": "^10.2.0",
+    "prettier": "^3.5.3",
+    "typedoc": "^0.25.13"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "pocketbase": "^0.26.0"
+  },
+  "keywords": [
+    "pocketbase",
+    "bun",
+    "utils"
+  ],
+  "author": "fromsko",
+  "license": "MIT"
+}

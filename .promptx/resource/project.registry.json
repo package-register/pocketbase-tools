@@ -1,0 +1,69 @@
+{
+  "version": "2.0.0",
+  "source": "project",
+  "metadata": {
+    "version": "2.0.0",
+    "description": "project 级资源注册表",
+    "createdAt": "2025-07-07T14:27:27.084Z",
+    "updatedAt": "2025-07-07T14:27:27.091Z",
+    "resourceCount": 3
+  },
+  "resources": [
+    {
+      "id": "xiaoan",
+      "source": "project",
+      "protocol": "role",
+      "name": "Xiaoan 角色",
+      "description": "专业角色，提供特定领域的专业能力",
+      "reference": "@project://.promptx/resource/role/xiaoan/xiaoan.role.md",
+      "metadata": {
+        "createdAt": "2025-07-07T14:27:27.089Z",
+        "updatedAt": "2025-07-07T14:27:27.089Z",
+        "scannedAt": "2025-07-07T14:27:27.088Z",
+        "filePath": "/Users/fromsko/Desktop/pocketbase-tools/.promptx/resource/role/xiaoan/xiaoan.role.md",
+        "fileType": "role"
+      }
+    },
+    {
+      "id": "domain-specific",
+      "source": "project",
+      "protocol": "thought",
+      "name": "Domain Specific 思维模式",
+      "description": "思维模式，指导AI的思考方式",
+      "reference": "@project://.promptx/resource/role/xiaoan/thought/domain-specific.thought.md",
+      "metadata": {
+        "createdAt": "2025-07-07T14:27:27.090Z",
+        "updatedAt": "2025-07-07T14:27:27.090Z",
+        "scannedAt": "2025-07-07T14:27:27.090Z",
+        "filePath": "/Users/fromsko/Desktop/pocketbase-tools/.promptx/resource/role/xiaoan/thought/domain-specific.thought.md",
+        "fileType": "thought"
+      }
+    },
+    {
+      "id": "domain-workflow",
+      "source": "project",
+      "protocol": "execution",
+      "name": "Domain Workflow 执行模式",
+      "description": "执行模式，定义具体的行为模式",
+      "reference": "@project://.promptx/resource/role/xiaoan/execution/domain-workflow.execution.md",
+      "metadata": {
+        "createdAt": "2025-07-07T14:27:27.091Z",
+        "updatedAt": "2025-07-07T14:27:27.091Z",
+        "scannedAt": "2025-07-07T14:27:27.091Z",
+        "filePath": "/Users/fromsko/Desktop/pocketbase-tools/.promptx/resource/role/xiaoan/execution/domain-workflow.execution.md",
+        "fileType": "execution"
+      }
+    }
+  ],
+  "stats": {
+    "totalResources": 3,
+    "byProtocol": {
+      "role": 1,
+      "thought": 1,
+      "execution": 1
+    },
+    "bySource": {
+      "project": 3
+    }
+  }
+}
