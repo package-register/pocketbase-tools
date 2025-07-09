@@ -36,6 +36,12 @@ export type UserUpdate = Partial<User> & {
   passwordConfirm?: string;
 };
 
+export type UserLogin = {
+  email?: string;
+  username?: string;
+  password: string;
+};
+
 export interface UserAction {
   addUser(user: Partial<UserCreate>): Promise<User | null>;
   updateUser(

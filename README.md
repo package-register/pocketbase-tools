@@ -82,6 +82,18 @@ const [fileUrl, token] = await useFiles.getCollectionURL(
 )
 ```
 
+## Publish
+
+```shell
+# 1. 重新构建
+rm -rf dist && bun run build
+````
+
+```shell
+# 2. 发布（如首次）
+npm publish --access public
+```
+
 ## Type System
 
 All interfaces and data structures are defined in the `src/types/` directory.
