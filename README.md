@@ -2,9 +2,11 @@
 
 ## Introduction
 
-A TypeScript toolkit for PocketBase, featuring a standard service/action/types layered structure. It provides interfaces and implementations for common business logic such as users, products, company profiles, and file utilities, making it suitable for secondary development and engineering extensions.
+A TypeScript toolkit for PocketBase, providing services for managing users, products, and company profiles.
 
 ## Installation
+
+You can install `pocketbase-tools` using npm or Bun:
 
 ```shell
 npm install pocketbase-tools
@@ -12,30 +14,28 @@ npm install pocketbase-tools
 bun add pocketbase-tools
 ```
 
-## Directory Structure
+## Publish
 
-```
-src/
-  base/                # Core features (collections, bootstrap, etc.)
-  utils/               # Utilities (logger, errorHandler, useFiles, ...)
-  types/               # Type definitions
-  user.service.ts      # User service interfaces
-  user.action.ts       # User action implementations
-  user.auth.ts         # User/Admin authentication
-  product.service.ts   # Product service interfaces
-  product.action.ts    # Product action implementations
-  profile.service.ts   # Company profile service interfaces
-  profile.action.ts    # Company profile action implementations
-  ...
-```
+To publish the package, follow these steps:
+
+1. Rebuild the project:
+
+    ```shell
+    rm -rf dist && bun run build
+    ```
+
+2. Publish the package (use `--access public` if it's your first time publishing):
+
+    ```shell
+    npm publish --access public
+    ```
 
 ## Quick Start
 
-Import all features from the package root for best DX:
+### Importing
 
 ```ts
-import {
-  pb,
+import pb, {
   userCollect,
   productCollect,
   profileCollect,
@@ -48,68 +48,96 @@ import {
   addProduct,
   getAllProducts,
   addCompanyProfile,
-  setAdminAccount,
   loginAdmin,
   loginUser,
   useFiles,
-} from "pocketbase-tools"
+} from "pocketbase-tools";
+```
 
-// Set admin account
-setAdminAccount({ email: "admin@xx.com", password: "yourpass" })
-await loginAdmin()
+### User Operations
 
-// User operations
-await addUser({ email: "test@xx.com", name: "test" })
-const users = await getAllUsers()
+```ts
+// Add a user
+await addUser({ email: "test@xx.com", name: "test" });
 
-// Product operations
-await addProduct({ title: "New Product" })
-const products = await getAllProducts()
+// Get all users
+const users = await getAllUsers();
 
-// Company profile operations
+// Update a user
+await updateUser(users[0].id, { name: "updated name" });
+
+// Delete a user
+await deleteUser(users[0].id);
+```
+
+### Product Operations
+
+```ts
+// Add a product
+await addProduct({ title: "New Product" });
+
+// Get all products
+const products = await getAllProducts();
+
+// Get a product by ID
+const product = await getProductById(products[0].id);
+
+// Update a product
+await updateProduct(products[0].id, { title: "Updated Product" });
+
+// Delete a product
+await deleteProduct(products[0].id);
+```
+
+### Profile Operations
+
+```ts
+// Add a company profile
 const record = await addCompanyProfile({
   companyName: "MyCo",
   contactEmail: "c@c.com",
   contactPhone: "123",
   companyAddress: "Address",
   allowRegistration: true,
-})
+});
 
-// File utilities example
+// List all company profiles
+const profiles = await listAllCompanyProfiles();
+
+// Update a company profile
+await updateCompanyProfile(profiles[0].id, { companyName: "Updated Co" });
+
+// Delete a company profile
+await deleteCompanyProfile(profiles[0].id);
+```
+
+### Authentication
+
+```ts
+// Admin login
+await loginAdmin({ email: "admin@xx.com", password: "yourpass" });
+
+// User login
+await loginUser({ username: "test@xx.com", password: "yourpass" });
+
+// Logout
+await logout();
+
+// Refresh token
+await refresh("admin");
+await refresh("user");
+```
+
+### File Utilities
+
+```ts
+// Get file URL and token
 const [fileUrl, token] = await useFiles.getCollectionURL(
   record.collectionName,
   "file.jpg"
-)
+);
 ```
 
-## Publish
+## License
 
-```shell
-# 1. 重新构建
-rm -rf dist && bun run build
-````
-
-```shell
-# 2. 发布（如首次）
-npm publish --access public
-```
-
-## Type System
-
-All interfaces and data structures are defined in the `src/types/` directory.
-
-## Collection Import Convention
-
-All pb instances and collection instances (such as userCollect, productCollect, profileCollect, etc.) are recommended to be imported directly from the package root.
-
-> ⚠️ `src/base/collections.ts` is deprecated and only kept for legacy compatibility. It will be removed in the future. Do not import from this file.
-
-## Export Details
-
-- Named exports: pb, userCollect, productCollect, profileCollect, superCollect, createPBClient, useFiles, etc.
-- Default export: pb (PocketBase client instance).
-- It is recommended to always use named imports (`import { ... } from "pocketbase-tools"`). Use `createPBClient` if you need a custom instance.
-
-## Contribution
-
-Issues and PRs are welcome!
+This project is licensed under the `MIT` License.
