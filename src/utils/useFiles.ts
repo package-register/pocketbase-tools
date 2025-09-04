@@ -1,23 +1,28 @@
-// 获取指定 collection 下文件的下载 URL 和授权 Token
-// 用法: const [fileUrl, token] = useFiles.getCollectionURL(collection, fileName)
 import { RecordModel } from "pocketbase";
-import pb from "../base";
+import { usePBClient } from "../base/client";
 
-export const useFiles = {
+interface IFilesAPI {
   /**
-   * 获取指定 collection 下文件的下载 URL 和授权 Token
-   * @param collection RecordModel 记录
-   * @param fileName 文件名
-   * @returns [url, token]
+   * 获取文件访问令牌
+   * @returns Promise<string> 返回文件访问令牌
    */
-  async getCollectionURL(
-    collection: RecordModel,
-    fileName: string,
-  ): Promise<[string, string]> {
-    // 获取当前用户的 token
-    const token = await pb.files.getToken();
-    // 拼接文件下载 URL
-    const url = pb.files.getURL(collection, fileName);
-    return [url, token];
+  getTokenPayload(): Promise<string>;
+  /**
+   * 获取指定 record 下文件的下载 URL
+   * @param record RecordModel 记录
+   * @param fileFiled 需要下载的文件字段
+   * @returns url 文件下载 URL
+   */
+  getAbsoluteURL(record: RecordModel, fileFiled: string): string;
+}
+
+const getInstance = () => usePBClient();
+
+export const useFiles: IFilesAPI = {
+  getTokenPayload: async (): Promise<string> => {
+    return await getInstance().files.getToken();
+  },
+  getAbsoluteURL: (record: RecordModel, fileFiled: string): string => {
+    return getInstance().files.getURL(record, fileFiled);
   },
 };

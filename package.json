@@ -1,21 +1,21 @@
 {
-  "name": "pocketbase-tools",
-  "version": "0.1.13",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "bun run format && tsc && vite build",
-    "prepublishOnly": "bun run build",
-    "test": "bun test",
-    "lint": "eslint src --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "docs": "typedoc --out docs src"
+  "author": "fromsko",
+  "dependencies": {
+    "pocketbase": "^0.26.0"
   },
-  "module": "./dist/index.mjs",
-  "type": "module",
-  "files": [
-    "dist"
-  ],
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^24.0.10",
+    "ajv": "8",
+    "ajv-draft-04": "^1.0.0",
+    "eslint": "^8.57.1",
+    "np": "^10.2.0",
+    "prettier": "^3.5.3",
+    "terser": "^5.44.0",
+    "typedoc": "^0.25.13",
+    "vite": "^7.0.3",
+    "vite-plugin-dts": "^4.5.4"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -23,31 +23,34 @@
       "require": "./dist/index.cjs"
     }
   },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@types/node": "^24.0.10",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "eslint": "^8.57.1",
-    "np": "^10.2.0",
-    "prettier": "^3.5.3",
-    "typedoc": "^0.25.13",
-    "ajv": "8",
-    "ajv-draft-04": "^1.0.0",
-    "vite": "^7.0.3",
-    "vite-plugin-dts": "^4.5.4"
-  },
-  "peerDependencies": {
-    "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "pocketbase": "^0.26.0"
-  },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "pocketbase",
     "bun",
     "utils"
   ],
-  "author": "fromsko",
-  "license": "MIT"
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "name": "pocketbase-tools",
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "build": "bun run format && tsc && vite build",
+    "build:prod": "bun run format && tsc && vite build --mode production",
+    "build:dev": "bun run format && tsc && vite build --mode development",
+    "docs": "typedoc --out docs src",
+    "format": "prettier --write \"src/**/*.ts\" \"*.ts\" \"*.json\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"*.ts\" \"*.json\"",
+    "prepack": "bun run build:prod",
+    "setup": "bun i",
+    "test": "bun test",
+    "test:watch": "bun test --watch"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "version": "0.1.15"
 }

@@ -1,13 +1,5 @@
-// src/lib/pocketbase/client.ts
 import PocketBase from "pocketbase";
 import { getEnvVar } from "../utils/env";
-
-// 类型扩展
-declare module "pocketbase" {
-  interface RecordService {
-    getFullName?(id: string): Promise<string>;
-  }
-}
 
 // 单例管理
 let globalInstance: PocketBase | null = null;
@@ -72,27 +64,7 @@ export function usePBClient(options?: {
   return initGlobalInstance();
 }
 
-/**
- * 安全获取集合
- * @param name 集合名称
- * @returns 集合实例
- * @throws 如果实例未初始化则抛出错误
- */
-export function getCollection<T = any>(name: string) {
-  const pb = usePBClient();
-  if (!pb) throw new Error("PocketBase 实例未初始化");
-  return pb.collection(name) as unknown as T;
-}
-
 export function resetPBInstances() {
   globalInstance = null;
   customInstance = null;
 }
-
-// 预定义集合
-export const collections = {
-  users: () => getCollection("users"),
-  products: () => getCollection("products"),
-  profile: () => getCollection("profile"),
-  superusers: () => getCollection("_superusers"),
-};

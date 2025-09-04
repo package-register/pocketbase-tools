@@ -1,143 +1,228 @@
-# pocketbase-tools
+# PocketBase Tools
 
-## Introduction
+一个用于 PocketBase 的 TypeScript 工具库，提供完整的客户端管理、服务操作和类型定义。
 
-A TypeScript toolkit for PocketBase, providing services for managing users, products, and company profiles.
+## 🚀 特性
 
-## Installation
+- ✅ **完整的导出管理** - 所有模块都已正确导出
+- ✅ **TypeScript 支持** - 完整的类型定义
+- ✅ **代码格式化** - 自动格式化和代码质量检查
+- ✅ **生产环境优化** - 代码混淆和压缩
+- ✅ **多格式支持** - ESM 和 CommonJS 双格式输出
 
-You can install `pocketbase-tools` using npm or Bun:
+## 📦 安装
 
-```shell
+```bash
 npm install pocketbase-tools
-# or
+# 或
+yarn add pocketbase-tools
+# 或
 bun add pocketbase-tools
 ```
 
-## Publish
+## 🛠️ 开发脚本
 
-To publish the package, follow these steps:
+### 构建相关
 
-1. Rebuild the project:
+```bash
+# 开发环境构建（未压缩，包含 source map）
+bun run build:dev
 
-    ```shell
-    rm -rf dist && bun run build
-    ```
+# 生产环境构建（压缩混淆，移除 console）
+bun run build:prod
 
-2. Publish the package (use `--access public` if it's your first time publishing):
+# 默认构建（等同于 build:prod）
+bun run build
+```
 
-    ```shell
-    npm publish --access public
-    ```
+### 代码质量
 
-## Quick Start
+```bash
+# 格式化所有代码
+bun run format
 
-### Importing
+# 检查代码格式
+bun run format:check
+```
 
-```ts
-import pb, {
+### 其他
+
+```bash
+# 生成文档
+bun run docs
+
+# 运行测试
+bun run test
+
+# 监听测试
+bun run test:watch
+
+# 安装依赖
+bun run setup
+```
+
+## 📁 项目结构
+
+```
+src/
+├── base/           # 基础客户端和设置
+│   ├── client.ts   # PocketBase 客户端管理
+│   └── setup.ts    # 集合预设置
+├── services/       # 业务服务
+│   ├── auth.action.ts     # 认证服务
+│   ├── product.action.ts  # 产品服务
+│   ├── profile.action.ts  # 配置文件服务
+│   └── user.action.ts     # 用户服务
+├── types/          # 类型定义
+│   ├── index.ts           # 类型导出
+│   ├── product.types.ts   # 产品类型
+│   ├── profile.types.ts   # 配置文件类型
+│   └── user.types.ts      # 用户类型
+├── utils/          # 工具函数
+│   ├── index.ts           # 工具导出
+│   ├── env.ts             # 环境变量处理
+│   ├── errorHandler.ts    # 错误处理
+│   ├── logger.ts          # 日志工具
+│   └── useFiles.ts        # 文件处理
+└── index.ts        # 主入口文件
+```
+
+## 🔧 配置文件
+
+### Prettier 配置 (`.prettierrc`)
+
+- 使用双引号
+- 2 空格缩进
+- 行宽 80 字符
+- 尾随逗号
+
+### ESLint 配置 (`.eslintrc.js`)
+
+- TypeScript 支持
+- 推荐规则集
+- 自定义代码风格规则
+
+### Vite 配置 (`vite.config.ts`)
+
+- 开发/生产环境区分
+- 生产环境代码混淆和压缩
+- 自动生成类型声明文件
+- Source map 支持
+
+## 📤 导出内容
+
+### 基础模块
+
+```typescript
+import { usePBClient, resetPBInstances } from "pocketbase-tools";
+import {
+  getCollect,
   userCollect,
   productCollect,
   profileCollect,
-  superCollect,
-  userService,
-  productService,
-  profileService,
-  addUser,
-  getAllUsers,
+} from "pocketbase-tools";
+import pb from "pocketbase-tools";
+```
+
+### 服务模块
+
+```typescript
+import {
+  // 认证服务
+  useAuth,
+
+  // 产品服务
   addProduct,
+  updateProduct,
+  deleteProduct,
   getAllProducts,
+  getProductById,
+
+  // 用户服务
+  getAllUsers,
+  addUser,
+  updateUser,
+  deleteUser,
+
+  // 配置文件服务
+  listAllCompanyProfiles,
   addCompanyProfile,
-  loginAdmin,
-  loginUser,
-  useFiles,
+  updateCompanyProfile,
+  deleteCompanyProfile,
 } from "pocketbase-tools";
 ```
 
-### User Operations
+### 类型定义
 
-```ts
-// Add a user
-await addUser({ email: "test@xx.com", name: "test" });
-
-// Get all users
-const users = await getAllUsers();
-
-// Update a user
-await updateUser(users[0].id, { name: "updated name" });
-
-// Delete a user
-await deleteUser(users[0].id);
+```typescript
+import {
+  User,
+  UserCreate,
+  UserUpdate,
+  Product,
+  ProfileCollection,
+} from "pocketbase-tools";
 ```
 
-### Product Operations
+### 工具函数
 
-```ts
-// Add a product
-await addProduct({ title: "New Product" });
-
-// Get all products
-const products = await getAllProducts();
-
-// Get a product by ID
-const product = await getProductById(products[0].id);
-
-// Update a product
-await updateProduct(products[0].id, { title: "Updated Product" });
-
-// Delete a product
-await deleteProduct(products[0].id);
+```typescript
+import {
+  getEnvVar,
+  validateEnvVars,
+  withErrorHandling,
+  logger,
+} from "pocketbase-tools";
 ```
 
-### Profile Operations
+## 🎯 使用示例
 
-```ts
-// Add a company profile
-const record = await addCompanyProfile({
-  companyName: "MyCo",
-  contactEmail: "c@c.com",
-  contactPhone: "123",
-  companyAddress: "Address",
-  allowRegistration: true,
+```typescript
+import { usePBClient, getAllUsers, logger } from "pocketbase-tools";
+
+// 初始化客户端
+const pb = usePBClient({
+  url: "http://localhost:8090",
 });
 
-// List all company profiles
-const profiles = await listAllCompanyProfiles();
+// 或者使用默认的
+import pb from "pocketbase-tools";
 
-// Update a company profile
-await updateCompanyProfile(profiles[0].id, { companyName: "Updated Co" });
-
-// Delete a company profile
-await deleteCompanyProfile(profiles[0].id);
+// 使用服务
+const users = await getAllUsers();
+logger.success("获取用户列表成功", users);
 ```
 
-### Authentication
+- 文件获取
 
-```ts
-// Admin login
-await loginAdmin({ email: "admin@xx.com", password: "yourpass" });
+```js
+import { filesCollect } from "pocketbase-tools";
 
-// User login
-await loginUser({ username: "test@xx.com", password: "yourpass" });
-
-// Logout
-await logout();
-
-// Refresh token
-await refresh("admin");
-await refresh("user");
+// 获取最新的文件记录
+const [record] = await filesCollect.getFullList({
+    sort: '-created',
+    limit: 1,
+});
+// 获取文件信息
+console.log(useFiles.getAbsoluteURL(record, record?.file))
 ```
 
-### File Utilities
+## 🔄 发布流程
 
-```ts
-// Get file URL and token
-const [fileUrl, token] = await useFiles.getCollectionURL(
-  record.collectionName,
-  "file.jpg"
-);
+项目配置了 `prepack` 钩子，在发布前会自动执行生产环境构建：
+
+```bash
+npm publish
+# 会自动执行: bun run build:prod
 ```
 
-## License
+## 📝 开发注意事项
 
-This project is licensed under the `MIT` License.
+1. **代码提交前**：运行 `bun run format` 确保代码格式正确
+2. **构建测试**：使用 `bun run build:prod` 测试生产环境构建
+3. **类型检查**：确保所有导出都有正确的类型定义
+4. **文档更新**：新增功能时更新 README 和类型注释
+
+## 📄 许可证
+
+MIT License

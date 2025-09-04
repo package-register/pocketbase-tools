@@ -1,5 +1,10 @@
-import { ApiError } from "../types";
 import { logger } from "./logger";
+
+export interface ApiError {
+  code: string;
+  message: string;
+  details?: Record<string, any>;
+}
 
 export class ErrorHandler {
   public handle(error: any): void {

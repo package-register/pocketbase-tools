@@ -1,4 +1,3 @@
-// src/lib/env.ts
 /**
  * 安全获取环境变量
  * @param key 环境变量键名
@@ -26,7 +25,7 @@ export function getEnvVar(key: string, defaultValue?: string): string {
  * 验证必需环境变量
  */
 export function validateEnvVars(requiredVars: string[]) {
-  requiredVars.forEach((key) => {
+  requiredVars.forEach(key => {
     try {
       getEnvVar(key);
     } catch (err: any) {
