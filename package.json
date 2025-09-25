@@ -13,6 +13,7 @@
     "prettier": "^3.5.3",
     "terser": "^5.44.0",
     "typedoc": "^0.25.13",
+    "typescript": "^5.4.5",
     "vite": "^7.0.3",
     "vite-plugin-dts": "^4.5.4"
   },
