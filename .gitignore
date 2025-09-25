@@ -32,3 +32,4 @@ bun.lockb
 # 测试/临时
 __tests__/
 
+scripts/pb_bin/
