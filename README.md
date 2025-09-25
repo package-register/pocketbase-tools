@@ -193,6 +193,45 @@ const users = await getAllUsers();
 logger.success("获取用户列表成功", users);
 ```
 
+### 认证服务 (`useAuth`)
+
+`useAuth` 提供了灵活的认证方法，支持在登录和刷新时指定 PocketBase 客户端的 URL 或实例。
+
+```typescript
+import { useAuth } from "pocketbase-tools";
+import PocketBase from "pocketbase"; // 如果需要直接传入实例
+
+// 示例 1: 登录时指定自定义 URL
+const adminLoginWithUrl = await useAuth.login('admin', {
+    email: 'admin@gmail.com',
+    password: 'admin123456',
+}, {
+    url: 'http://127.0.0.1:8090', // 指定 PocketBase 服务地址
+});
+logger.success('管理员通过自定义 URL 登录成功', adminLoginWithUrl.record);
+
+// 示例 2: 登录时指定自定义 PocketBase 实例
+const customPbInstance = new PocketBase('http://127.0.0.1:8090');
+const adminLoginWithInstance = await useAuth.login('admin', {
+    email: 'admin@gmail.com',
+    password: 'admin123456',
+}, {
+    instance: customPbInstance, // 传入自定义 PocketBase 实例
+});
+logger.success('管理员通过自定义实例登录成功', adminLoginWithInstance.record);
+
+// 示例 3: 使用默认配置的客户端 (例如，通过环境变量 VITE_POCKETBASE_URL 配置)
+const adminLoginDefault = await useAuth.login('admin', {
+    email: 'admin@gmail.com',
+    password: 'admin123456',
+});
+logger.success('管理员通过默认客户端登录成功', adminLoginDefault.record);
+
+// 刷新认证信息时也可以使用 clientOptions
+const refreshedAuth = await useAuth.refresh('admin', { url: 'http://127.0.0.1:8090' });
+logger.success('刷新认证信息成功', refreshedAuth.record);
+```
+
 - 文件获取
 
 ```js

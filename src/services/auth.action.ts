@@ -1,7 +1,7 @@
-import { RecordAuthResponse, RecordModel } from "pocketbase";
+import PocketBase, { RecordAuthResponse, RecordModel } from "pocketbase";
 import { usePBClient } from "../base/client";
-import { superusersCollect, userCollect } from "../base/setup";
 import { logger } from "../utils";
+import { userCollect } from "../base/setup"; // Keep userCollect for verify function
 
 export type Role = "admin" | "user";
 
@@ -15,7 +15,7 @@ export interface UserLogin {
 }
 
 export interface AuthActions {
-  login: (role: Role, account: UserLogin) => PromiseAuth;
+  login: (role: Role, account: UserLogin, clientOptions?: { url?: string; instance?: PocketBase }) => PromiseAuth;
   logout: () => void;
 
   refresh: (role: Role) => PromiseAuth;
@@ -33,29 +33,31 @@ const logSuccess = (action: string, message: string, data?: any) =>
   logger.success(`${action} ${message}`, data);
 
 // 获取 PocketBase 客户端实例
-const getPBClient = () => usePBClient();
+const getPBClient = (options?: { url?: string; instance?: PocketBase }) => usePBClient(options);
 
-// 获取正确的集合
-const getCollection = (role: Role) =>
-  role === "admin" ? superusersCollect : userCollect;
+// 获取正确的集合名称
+const getCollectionName = (role: Role) =>
+  role === "admin" ? "_superusers" : "users";
 
 // 获取正确的标识符字段
 const getIdentifierField = (role: Role) =>
   role === "admin" ? "email" : "username";
 
 // 登录函数
-const login = async (role: Role, account: UserLogin): PromiseAuth => {
+const login = async (role: Role, account: UserLogin, clientOptions?: { url?: string; instance?: PocketBase }): PromiseAuth => {
   const { password } = account;
   if (!password) throw new Error("缺少密码");
 
-  const collection = getCollection(role);
+  const pb = getPBClient(clientOptions); // Use the provided client options
+  const collectionName = getCollectionName(role); // Get the collection name
   const identifierField = getIdentifierField(role);
   const identifier = account[identifierField];
 
   if (!identifier)
     throw new Error(`缺少${identifierField === "email" ? "邮箱" : "用户名"}`);
 
-  const authData = await collection.authWithPassword(identifier, password);
+  // Use the specific PocketBase instance for authentication
+  const authData = await pb.collection(collectionName).authWithPassword(identifier, password);
   logSuccess(role, AUTH_SUCCESS);
   return authData;
 };
@@ -70,9 +72,10 @@ const logout = (): void => {
 };
 
 // 刷新认证信息函数
-const refresh = async (role: Role): PromiseAuth => {
-  const collection = getCollection(role);
-  const data = await collection.authRefresh();
+const refresh = async (role: Role, clientOptions?: { url?: string; instance?: PocketBase }): PromiseAuth => {
+  const pb = getPBClient(clientOptions);
+  const collectionName = getCollectionName(role);
+  const data = await pb.collection(collectionName).authRefresh();
   logSuccess(role, REFRESH_SUCCESS, data);
   return data;
 };
