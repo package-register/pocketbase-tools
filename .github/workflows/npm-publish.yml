@@ -9,7 +9,7 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # 必须要有此权限才能创建 Release
       
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +24,24 @@ jobs:
       - name: Build
         run: bun run build
 
+      - name: Get Package Info
+        id: package_info
+        run: |
+          # 提取版本号和包名
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+
       - name: Publish to NPM
+        id: publish_check
         env:
           NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          PACKAGE_VERSION="${{ steps.package_info.outputs.PACKAGE_VERSION }}"
+          PACKAGE_NAME="${{ steps.package_info.outputs.PACKAGE_NAME }}"
           
+          # 检查版本是否已发布
           if bun pm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" --registry https://registry.npmjs.org/ > /dev/null 2>&1; then
             echo "Version ${PACKAGE_VERSION} is already published. Skipping."
             echo "published=true" >> $GITHUB_OUTPUT
@@ -39,34 +50,30 @@ jobs:
             echo "published=false" >> $GITHUB_OUTPUT
             bun publish --access public
           fi
-        id: publish_check
-
-      - name: Create release
+          
+      # ----------------------------------------------------
+      # 1. 压缩构建产物 (dist 目录) 为单个文件
+      # ----------------------------------------------------
+      - name: Create release artifact (ZIP)
         if: steps.publish_check.outputs.published == 'false'
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: zip_artifact
+        run: |
+          ZIP_FILE_NAME="${{ steps.package_info.outputs.PACKAGE_NAME }}-${{ steps.package_info.outputs.PACKAGE_VERSION }}.zip"
+          # 压缩 dist 目录到 zip 文件
+          zip -r $ZIP_FILE_NAME dist
+          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_OUTPUT # 记录文件名供上传步骤使用
+          
+      # ----------------------------------------------------
+      # 2. 使用 softprops/action-gh-release@v2 创建 Release 并上传文件
+      # ----------------------------------------------------
+      - name: Create GitHub Release and Upload Asset
+        if: steps.publish_check.outputs.published == 'false'
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.ref_name }}
-          release_name: Release v${{ github.ref_name }}
+          tag_name: v${{ steps.package_info.outputs.PACKAGE_VERSION }}
+          name: Release v${{ steps.package_info.outputs.PACKAGE_VERSION }}
           draft: false
           prerelease: false
-
-      - name: Get package version
-        if: steps.publish_check.outputs.published == 'false'
-        id: get_version
-        run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "PACKAGE_VERSION=${PACKAGE_VERSION}" >> $GITHUB_ENV
-
-      - name: Upload Release Asset
-        if: steps.publish_check.outputs.published == 'false'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist
-          asset_name: ${{ env.PACKAGE_VERSION }}.zip
-          asset_content_type: application/zip
+          # 使用 files 输入指定要上传的文件路径
+          files: |
+            ${{ steps.zip_artifact.outputs.ZIP_FILE_NAME }}
