@@ -8,8 +8,11 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -21,23 +24,21 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Check if version is published
-        id: check_version
+      - name: Publish to NPM
+        env:
+          # Bun recognizes this specific environment variable for authentication
+          # and it is the recommended way to provide a token in CI/CD.
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" > /dev/null 2>&1; then
+          
+          # Check if the version is already published on the registry.
+          # The '--registry' flag is included for robustness in case of custom registries.
+          if bun pm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" --registry https://registry.npmjs.org/ > /dev/null 2>&1; then
             echo "Version ${PACKAGE_VERSION} is already published. Skipping."
-            echo "published=true" >> $GITHUB_OUTPUT
           else
             echo "Version ${PACKAGE_VERSION} is not published. Publishing."
-            echo "published=false" >> $GITHUB_OUTPUT
+            # Use 'bun publish' directly. It will use the NPM_CONFIG_TOKEN for authentication.
+            bun publish --access public
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-
-      - name: Publish
-        if: steps.check_version.outputs.published == 'false'
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
